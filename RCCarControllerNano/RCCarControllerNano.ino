@@ -24,7 +24,7 @@
 */
 
 const unsigned long BLUETOOTH_BAUD_RATE = 9600;
-const unsigned long COMMAND_TIMEOUT_MS = 800;
+const unsigned long COMMAND_TIMEOUT_MS = 300;
 
 const int MAX_MOTOR_PWM = 160;
 const int MAX_LEFT_MOTOR_PWM = MAX_MOTOR_PWM;
@@ -134,70 +134,15 @@ void parseControlPacket(char *packet) {
   char *xToken = strtok(packet, ",");
   char *yToken = strtok(NULL, ",");
   char *buttonsToken = strtok(NULL, ",");
-  char *extraToken = strtok(NULL, ",");
 
-  if (xToken == NULL || yToken == NULL || buttonsToken == NULL || extraToken != NULL) {
+  if (xToken == NULL || yToken == NULL || buttonsToken == NULL) {
     return;
   }
 
-  int parsedX = 0;
-  int parsedY = 0;
-  int parsedButtons = 0;
-
-  if (!parseIntField(xToken, -255, 255, parsedX) ||
-      !parseIntField(yToken, -255, 255, parsedY) ||
-      !parseIntField(buttonsToken, 0, 255, parsedButtons)) {
-    return;
-  }
-
-  commandX = parsedX;
-  commandY = parsedY;
-  commandButtons = parsedButtons;
+  commandX = constrain(atoi(xToken), -255, 255);
+  commandY = constrain(atoi(yToken), -255, 255);
+  commandButtons = constrain(atoi(buttonsToken), 0, 255);
   lastCommandTime = millis();
-}
-
-bool parseIntField(const char *text, int minValue, int maxValue, int &value) {
-  if (*text == '\0') {
-    return false;
-  }
-
-  bool negative = false;
-
-  if (*text == '-') {
-    negative = true;
-    text++;
-
-    if (*text == '\0') {
-      return false;
-    }
-  }
-
-  long result = 0;
-
-  while (*text != '\0') {
-    if (*text < '0' || *text > '9') {
-      return false;
-    }
-
-    result = (result * 10) + (*text - '0');
-
-    if (result > 255) {
-      return false;
-    }
-
-    text++;
-  }
-
-  if (negative) {
-    result = -result;
-  }
-
-  if (result < minValue || result > maxValue) {
-    return false;
-  }
-
-  value = result;
-  return true;
 }
 
 void driveFromStick(int x, int y) {
