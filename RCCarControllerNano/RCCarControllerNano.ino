@@ -26,6 +26,10 @@
 const unsigned long BLUETOOTH_BAUD_RATE = 9600;
 const unsigned long COMMAND_TIMEOUT_MS = 300;
 
+const int MAX_MOTOR_PWM = 160;
+const int MAX_LEFT_MOTOR_PWM = MAX_MOTOR_PWM;
+const int MAX_RIGHT_MOTOR_PWM = MAX_MOTOR_PWM;
+
 const byte PWMA_PIN = 5;
 const byte AIN2_PIN = 6;
 const byte AIN1_PIN = 7;
@@ -145,14 +149,15 @@ void driveFromStick(int x, int y) {
   const int leftSpeed = constrain(y + x, -255, 255);
   const int rightSpeed = constrain(y - x, -255, 255);
 
-  setMotor(PWMA_PIN, AIN1_PIN, AIN2_PIN, leftSpeed);
-  setMotor(PWMB_PIN, BIN1_PIN, BIN2_PIN, rightSpeed);
+  setMotor(PWMA_PIN, AIN1_PIN, AIN2_PIN, leftSpeed, MAX_LEFT_MOTOR_PWM);
+  setMotor(PWMB_PIN, BIN1_PIN, BIN2_PIN, rightSpeed, MAX_RIGHT_MOTOR_PWM);
 
   digitalWrite(STBY_PIN, HIGH);
 }
 
-void setMotor(byte pwmPin, byte in1Pin, byte in2Pin, int speed) {
-  const int pwm = abs(speed);
+void setMotor(byte pwmPin, byte in1Pin, byte in2Pin, int speed, int maxPwm) {
+  const int safeMaxPwm = constrain(maxPwm, 0, 255);
+  const int pwm = map(abs(speed), 0, 255, 0, safeMaxPwm);
 
   if (speed > 0) {
     digitalWrite(in1Pin, HIGH);
@@ -169,8 +174,8 @@ void setMotor(byte pwmPin, byte in1Pin, byte in2Pin, int speed) {
 }
 
 void stopMotors() {
-  setMotor(PWMA_PIN, AIN1_PIN, AIN2_PIN, 0);
-  setMotor(PWMB_PIN, BIN1_PIN, BIN2_PIN, 0);
+  setMotor(PWMA_PIN, AIN1_PIN, AIN2_PIN, 0, MAX_LEFT_MOTOR_PWM);
+  setMotor(PWMB_PIN, BIN1_PIN, BIN2_PIN, 0, MAX_RIGHT_MOTOR_PWM);
   digitalWrite(STBY_PIN, LOW);
 }
 

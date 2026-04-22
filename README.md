@@ -13,6 +13,23 @@ Remote controller HC-05 pins used by the sketch:
 
 Both boards use their hardware UART pins for HC-05 Bluetooth. Disconnect the HC-05 RX/TX wires while uploading sketches if the IDE cannot upload.
 
+## Motor Speed Limit
+
+Set the car's maximum motor PWM in `RCCarControllerNano/RCCarControllerNano.ino`:
+
+```cpp
+const int MAX_MOTOR_PWM = 160;
+```
+
+The remote still sends joystick commands from `-255` to `255`, and the car scales them to the configured maximum. For example, with `MAX_MOTOR_PWM = 160`, full stick produces PWM `160`, half stick produces about PWM `80`, and neutral produces PWM `0`.
+
+If one side is stronger than the other, trim the motors separately:
+
+```cpp
+const int MAX_LEFT_MOTOR_PWM = MAX_MOTOR_PWM;
+const int MAX_RIGHT_MOTOR_PWM = MAX_MOTOR_PWM;
+```
+
 ## Compile and Upload
 
 These commands use `arduino-cli`. Install the Arduino AVR core once if it is not already installed:
