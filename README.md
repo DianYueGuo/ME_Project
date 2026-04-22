@@ -22,7 +22,15 @@ Set the controller packet interval in `RemoteControllerUNO/RemoteControllerUNO.i
 const unsigned long SEND_INTERVAL_MS = 100;
 ```
 
-The remote checks the controller at most once every `100 ms`. It sends immediately when the command changes, and sends a keepalive every `500 ms` when the command is unchanged so the car does not enter fail-safe. If Bluetooth control is unreliable, try `100` to `200`. If control is stable and you want faster response, try `50`.
+The remote sends one packet every `100 ms`, similar to the simple button test. If Bluetooth control is unreliable, try `100` to `200`. If control is stable and you want faster response, try `50`.
+
+The main controller uses a compact 5-byte packet instead of text commands:
+
+```text
+0xAA, encoded_x, encoded_y, buttons, checksum
+```
+
+The checksum is `encoded_x ^ encoded_y ^ buttons`. The car ignores packets with a bad checksum.
 
 ## Motor Speed Limit
 
