@@ -13,6 +13,16 @@ Remote controller HC-05 pins used by the sketch:
 
 Both boards use their hardware UART pins for HC-05 Bluetooth. Disconnect the HC-05 RX/TX wires while uploading sketches if the IDE cannot upload.
 
+## Remote Send Rate
+
+Set the controller packet interval in `RemoteControllerUNO/RemoteControllerUNO.ino`:
+
+```cpp
+const unsigned long SEND_INTERVAL_MS = 100;
+```
+
+The remote checks the controller at most once every `100 ms`. It sends immediately when the command changes, and sends a keepalive every `500 ms` when the command is unchanged so the car does not enter fail-safe. If Bluetooth control is unreliable, try `100` to `200`. If control is stable and you want faster response, try `50`.
+
 ## Motor Speed Limit
 
 Set the car's maximum motor PWM in `RCCarControllerNano/RCCarControllerNano.ino`:

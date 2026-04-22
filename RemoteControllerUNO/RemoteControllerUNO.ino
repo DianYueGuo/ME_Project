@@ -23,7 +23,8 @@
 */
 
 const unsigned long BLUETOOTH_BAUD_RATE = 9600;
-const unsigned long SEND_INTERVAL_MS = 30;
+const unsigned long SEND_INTERVAL_MS = 100;
+const unsigned long KEEPALIVE_INTERVAL_MS = 500;
 
 const byte STICK_X_PIN = A0;
 const byte STICK_Y_PIN = A1;
@@ -36,6 +37,10 @@ const int Y_CENTER = 513;
 const int STICK_DEADBAND = 35;
 
 unsigned long lastSendTime = 0;
+unsigned long lastPacketTime = 0;
+int lastSentX = 999;
+int lastSentY = 999;
+byte lastSentButtons = 255;
 
 void setup() {
   Serial.begin(BLUETOOTH_BAUD_RATE);
@@ -60,6 +65,16 @@ void loop() {
   const int x = readStickAxis(STICK_X_PIN, X_CENTER);
   const int y = readStickAxis(STICK_Y_PIN, Y_CENTER);
   const byte buttons = readButtons();
+  const bool commandChanged = x != lastSentX || y != lastSentY || buttons != lastSentButtons;
+
+  if (!commandChanged && now - lastPacketTime < KEEPALIVE_INTERVAL_MS) {
+    return;
+  }
+
+  lastSentX = x;
+  lastSentY = y;
+  lastSentButtons = buttons;
+  lastPacketTime = now;
 
   sendControlPacket(x, y, buttons);
 }
