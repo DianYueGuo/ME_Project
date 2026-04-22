@@ -4,6 +4,7 @@
 
 - `RemoteControllerUNO/RemoteControllerUNO.ino` reads the UNO controller buttons and XY stick, then sends joystick packets through an HC-05 Bluetooth module.
 - `RCCarControllerNano/RCCarControllerNano.ino` receives those packets on the Nano and drives the TB6612FNG motor driver with differential steering.
+- `MotorTestNano/MotorTestNano.ino` tests the Nano, TB6612FNG, motor power, and motor wiring without Bluetooth.
 
 Remote controller HC-05 pins used by the sketch:
 - **D0 (RX)** ← HC-05 TX
@@ -64,6 +65,23 @@ Some Nano boards use the old bootloader. If upload fails with a sync or timeout 
 arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
 arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
 ```
+
+Compile and upload the motor-only Nano test:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old MotorTestNano
+arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old MotorTestNano
+```
+
+The motor test repeats this sequence:
+- both motors forward for 2 seconds
+- stop for 1 second
+- both motors reverse for 2 seconds
+- stop for 1 second
+- motor A only for 2 seconds
+- stop for 1 second
+- motor B only for 2 seconds
+- stop for 1 second
 
 ## Remote Controller Details
 
