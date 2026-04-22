@@ -12,6 +12,59 @@ Remote controller HC-05 pins used by the sketch:
 
 Both boards use their hardware UART pins for HC-05 Bluetooth. Disconnect the HC-05 RX/TX wires while uploading sketches if the IDE cannot upload.
 
+## Compile and Upload
+
+These commands use `arduino-cli`. Install the Arduino AVR core once if it is not already installed:
+
+```sh
+arduino-cli core update-index
+arduino-cli core install arduino:avr
+```
+
+List connected boards and note the serial port, for example `/dev/cu.usbmodem...` on macOS or `COM3` on Windows:
+
+```sh
+arduino-cli board list
+```
+
+Compile the remote controller UNO sketch:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:uno RemoteControllerUNO
+```
+
+Upload the remote controller UNO sketch:
+
+```sh
+arduino-cli upload -p <UNO_PORT> --fqbn arduino:avr:uno RemoteControllerUNO
+```
+
+If this board only uploads in Arduino IDE when **Processor** is set to **ATmega328P (Old Bootloader)**, use the Nano old-bootloader FQBN instead:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old RemoteControllerUNO
+arduino-cli upload -p <UNO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old RemoteControllerUNO
+```
+
+Compile the RC car Nano sketch:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:nano RCCarControllerNano
+```
+
+Upload the RC car Nano sketch:
+
+```sh
+arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano RCCarControllerNano
+```
+
+Some Nano boards use the old bootloader. If upload fails with a sync or timeout error, try this FQBN instead:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
+arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
+```
+
 ## Remote Controller Details
 
 Button A: pressed D2=0, released D2=1
