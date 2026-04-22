@@ -16,18 +16,15 @@
   - D11 -> TB6612FNG PWMB
 
   Packet format received from the remote:
-  0xAA, x, y, buttons, checksum
+  <x,y,buttons>
 
-  x and y are encoded bytes where 0 is full negative, 127 is neutral,
-  and 254 is full positive.
+  x and y are signed values from -255 to 255.
   y controls throttle: positive forward, negative reverse.
   x controls steering: positive right, negative left.
-  checksum is x ^ y ^ buttons.
 */
 
 const unsigned long BLUETOOTH_BAUD_RATE = 9600;
 const unsigned long COMMAND_TIMEOUT_MS = 800;
-const byte PACKET_START = 0xAA;
 
 const int MAX_MOTOR_PWM = 160;
 const int MAX_LEFT_MOTOR_PWM = MAX_MOTOR_PWM;
@@ -48,18 +45,11 @@ const byte S_GATE_PIN = 12;
 const byte HC05_STATE_PIN = 13;
 const byte HC05_ENABLE_PIN = A0;
 
-enum PacketState {
-  WAIT_FOR_START,
-  READ_X,
-  READ_Y,
-  READ_BUTTONS,
-  READ_CHECKSUM
-};
+const byte SERIAL_BUFFER_SIZE = 32;
 
-PacketState packetState = WAIT_FOR_START;
-byte packetX = 127;
-byte packetY = 127;
-byte packetButtons = 0;
+char serialBuffer[SERIAL_BUFFER_SIZE];
+byte serialBufferIndex = 0;
+bool receivingPacket = false;
 
 int commandX = 0;
 int commandY = 0;
@@ -111,51 +101,103 @@ void loop() {
 
 void readBluetooth() {
   while (Serial.available() > 0) {
-    const byte incoming = Serial.read();
+    const char incoming = Serial.read();
 
-    switch (packetState) {
-      case WAIT_FOR_START:
-        if (incoming == PACKET_START) {
-          packetState = READ_X;
-        }
-        break;
+    if (incoming == '<') {
+      receivingPacket = true;
+      serialBufferIndex = 0;
+      continue;
+    }
 
-      case READ_X:
-        packetX = incoming;
-        packetState = READ_Y;
-        break;
+    if (!receivingPacket) {
+      continue;
+    }
 
-      case READ_Y:
-        packetY = incoming;
-        packetState = READ_BUTTONS;
-        break;
+    if (incoming == '>') {
+      serialBuffer[serialBufferIndex] = '\0';
+      parseControlPacket(serialBuffer);
+      receivingPacket = false;
+      serialBufferIndex = 0;
+      continue;
+    }
 
-      case READ_BUTTONS:
-        packetButtons = incoming;
-        packetState = READ_CHECKSUM;
-        break;
-
-      case READ_CHECKSUM:
-        parseControlPacket(packetX, packetY, packetButtons, incoming);
-        packetState = WAIT_FOR_START;
-        break;
+    if (serialBufferIndex < SERIAL_BUFFER_SIZE - 1) {
+      serialBuffer[serialBufferIndex++] = incoming;
+    } else {
+      receivingPacket = false;
+      serialBufferIndex = 0;
     }
   }
 }
 
-void parseControlPacket(byte encodedX, byte encodedY, byte buttons, byte checksum) {
-  if ((encodedX ^ encodedY ^ buttons) != checksum) {
+void parseControlPacket(char *packet) {
+  char *xToken = strtok(packet, ",");
+  char *yToken = strtok(NULL, ",");
+  char *buttonsToken = strtok(NULL, ",");
+  char *extraToken = strtok(NULL, ",");
+
+  if (xToken == NULL || yToken == NULL || buttonsToken == NULL || extraToken != NULL) {
     return;
   }
 
-  commandX = decodeAxis(encodedX);
-  commandY = decodeAxis(encodedY);
-  commandButtons = buttons;
+  int parsedX = 0;
+  int parsedY = 0;
+  int parsedButtons = 0;
+
+  if (!parseIntField(xToken, -255, 255, parsedX) ||
+      !parseIntField(yToken, -255, 255, parsedY) ||
+      !parseIntField(buttonsToken, 0, 255, parsedButtons)) {
+    return;
+  }
+
+  commandX = parsedX;
+  commandY = parsedY;
+  commandButtons = parsedButtons;
   lastCommandTime = millis();
 }
 
-int decodeAxis(byte value) {
-  return map(constrain(value, 0, 254), 0, 254, -255, 255);
+bool parseIntField(const char *text, int minValue, int maxValue, int &value) {
+  if (*text == '\0') {
+    return false;
+  }
+
+  bool negative = false;
+
+  if (*text == '-') {
+    negative = true;
+    text++;
+
+    if (*text == '\0') {
+      return false;
+    }
+  }
+
+  long result = 0;
+
+  while (*text != '\0') {
+    if (*text < '0' || *text > '9') {
+      return false;
+    }
+
+    result = (result * 10) + (*text - '0');
+
+    if (result > 255) {
+      return false;
+    }
+
+    text++;
+  }
+
+  if (negative) {
+    result = -result;
+  }
+
+  if (result < minValue || result > maxValue) {
+    return false;
+  }
+
+  value = result;
+  return true;
 }
 
 void driveFromStick(int x, int y) {
