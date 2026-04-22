@@ -5,7 +5,6 @@
 - `RemoteControllerUNO/RemoteControllerUNO.ino` reads the UNO controller buttons and XY stick, then sends joystick packets through an HC-05 Bluetooth module.
 - `RCCarControllerNano/RCCarControllerNano.ino` receives those packets on the Nano and drives the TB6612FNG motor driver with differential steering.
 - `MotorTestNano/MotorTestNano.ino` tests the Nano, TB6612FNG, motor power, and motor wiring without Bluetooth.
-- `SimpleButtonRemoteUNO/SimpleButtonRemoteUNO.ino` and `SimpleButtonMotorNano/SimpleButtonMotorNano.ino` test the Bluetooth link with Button A only.
 
 Remote controller HC-05 pins used by the sketch:
 - **D0 (RX)** ← HC-05 TX
@@ -93,18 +92,6 @@ Some Nano boards use the old bootloader. If upload fails with a sync or timeout 
 arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
 arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old RCCarControllerNano
 ```
-
-Compile and upload the simplest Button A Bluetooth motor test:
-
-```sh
-arduino-cli compile --fqbn arduino:avr:uno SimpleButtonRemoteUNO
-arduino-cli upload -p <UNO_PORT> --fqbn arduino:avr:uno SimpleButtonRemoteUNO
-
-arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old SimpleButtonMotorNano
-arduino-cli upload -p <NANO_PORT> --fqbn arduino:avr:nano:cpu=atmega328old SimpleButtonMotorNano
-```
-
-With this test, holding Button A should run both motors forward at PWM `150`; releasing Button A should stop both motors.
 
 Compile and upload the motor-only Nano test:
 
