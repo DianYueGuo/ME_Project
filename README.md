@@ -1,5 +1,17 @@
 # ME_Project
 
+## Arduino Sketches
+
+- `RemoteControllerUNO/RemoteControllerUNO.ino` reads the UNO controller buttons and XY stick, then sends joystick packets through an HC-05 Bluetooth module.
+- `RCCarControllerNano/RCCarControllerNano.ino` receives those packets on the Nano and drives the TB6612FNG motor driver with differential steering.
+
+Remote controller HC-05 pins used by the sketch:
+- **D0 (RX)** ← HC-05 TX
+- **D1 (TX)** → HC-05 RX (via 1k/2k resistor divider)
+- Bluetooth baud rate: **9600**
+
+Both boards use their hardware UART pins for HC-05 Bluetooth. Disconnect the HC-05 RX/TX wires while uploading sketches if the IDE cannot upload.
+
 ## Remote Controller Details
 
 Button A: pressed D2=0, released D2=1
