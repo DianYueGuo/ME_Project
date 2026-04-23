@@ -41,12 +41,12 @@ const byte GATE_SERVO_PIN = 12;
 
 const int PICKER_MIN_ANGLE = 10;
 const int PICKER_MAX_ANGLE = 180;
-const int PICKER_START_ANGLE = 10;
+const int PICKER_START_ANGLE = PICKER_MIN_ANGLE;
 const int PICKER_STEP_ANGLE = 10;
 
-const int PITCH_MIN_ANGLE = 40;
+const int PITCH_MIN_ANGLE = 35;
 const int PITCH_MAX_ANGLE = 133;
-const int PITCH_START_ANGLE = 40;
+const int PITCH_START_ANGLE = PITCH_MIN_ANGLE;
 const int PITCH_STEP_ANGLE = 5;
 const int PITCH_SWING_STEP_ANGLE = 1;
 
