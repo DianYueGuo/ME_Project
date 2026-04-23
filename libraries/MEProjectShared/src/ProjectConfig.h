@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-const unsigned long SERIAL_BAUD_RATE = 38400;
+const unsigned long SERIAL_BAUD_RATE = 9600;
 const unsigned long SEND_INTERVAL_MS = 25;
 const unsigned long FAILSAFE_TIMEOUT_MS = 300;
 const unsigned long RECEIVE_TIMEOUT_MS = 300;
