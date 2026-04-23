@@ -1,5 +1,47 @@
 # ME_Project
 
+## Compile and Upload with arduino-cli
+
+Install the Arduino AVR core if it is not already installed:
+
+```sh
+arduino-cli core install arduino:avr
+```
+
+List connected Arduino serial ports:
+
+```sh
+arduino-cli board list
+```
+
+Compile the UNO sender:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:uno SenderUNO
+```
+
+Upload the UNO sender, replacing `/dev/cu.usbmodemXXXX` with the UNO port from `arduino-cli board list`:
+
+```sh
+arduino-cli upload -p /dev/cu.usbmodemXXXX --fqbn arduino:avr:uno SenderUNO
+```
+
+Compile the Nano receiver with the old ATmega328P bootloader:
+
+```sh
+arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old --libraries /Users/joseph/Library/Arduino15/libraries ReceiverNano
+```
+
+Upload the Nano receiver, replacing `/dev/cu.usbserialXXXX` with the Nano port from `arduino-cli board list`:
+
+```sh
+arduino-cli upload -p /dev/cu.usbserialXXXX --fqbn arduino:avr:nano:cpu=atmega328old ReceiverNano
+```
+
+The receiver uses `Servo.h`. On this machine, `Servo.h` is installed under `/Users/joseph/Library/Arduino15/libraries`, but `arduino-cli lib list` does not include it by default, so the Nano compile command passes that folder explicitly.
+
+If upload fails while the HC-05 is connected to D0/D1, disconnect the HC-05 TX/RX wires, upload again, then reconnect them.
+
 ## Remote Controller Details (Sender)
 
 Button A: pressed D2=0, released D2=1
