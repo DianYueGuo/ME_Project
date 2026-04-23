@@ -17,28 +17,36 @@ arduino-cli board list
 Compile the UNO sender:
 
 ```sh
-arduino-cli compile --fqbn arduino:avr:uno SenderUNO
+arduino-cli compile --fqbn arduino:avr:uno --library libraries/MEProjectShared SenderUNO
 ```
 
-Upload the UNO sender, replacing `/dev/cu.usbmodemXXXX` with the UNO port from `arduino-cli board list`:
+Compile and upload the UNO sender, replacing `/dev/cu.usbmodemXXXX` with the UNO port from `arduino-cli board list`:
 
 ```sh
-arduino-cli upload -p /dev/cu.usbmodemXXXX --fqbn arduino:avr:uno SenderUNO
+arduino-cli compile --upload -p /dev/cu.usbmodemXXXX --fqbn arduino:avr:uno --library libraries/MEProjectShared SenderUNO
 ```
 
 Compile the Nano receiver with the old ATmega328P bootloader:
 
 ```sh
-arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old --libraries /Users/joseph/Library/Arduino15/libraries ReceiverNano
+arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old --library libraries/MEProjectShared --library ~/Library/Arduino15/libraries/Servo ReceiverNano
 ```
 
-Upload the Nano receiver, replacing `/dev/cu.usbserialXXXX` with the Nano port from `arduino-cli board list`:
+Compile and upload the Nano receiver, replacing `/dev/cu.usbserialXXXX` with the Nano port from `arduino-cli board list`:
 
 ```sh
-arduino-cli upload -p /dev/cu.usbserialXXXX --fqbn arduino:avr:nano:cpu=atmega328old ReceiverNano
+arduino-cli compile --upload -p /dev/cu.usbserialXXXX --fqbn arduino:avr:nano:cpu=atmega328old --library libraries/MEProjectShared --library ~/Library/Arduino15/libraries/Servo ReceiverNano
 ```
 
-The receiver uses `Servo.h`. On this machine, `Servo.h` is installed under `/Users/joseph/Library/Arduino15/libraries`, but `arduino-cli lib list` does not include it by default, so the Nano compile command passes that folder explicitly.
+The receiver uses `Servo.h` and the repo-local `MEProjectShared` library. On this machine, `Servo.h` is installed under `~/Library/Arduino15/libraries/Servo`, but `arduino-cli lib list` does not include it by default, so Nano commands pass that folder explicitly.
+
+Shared project settings and helpers live in:
+
+```text
+libraries/MEProjectShared/src
+```
+
+Change shared baud rate, HC-05 pins, packet format, servo limits, or diagnostic swing behavior there so the main sketches and test sketches stay aligned.
 
 If upload fails while the HC-05 is connected to D0/D1, disconnect the HC-05 TX/RX wires, upload again, then reconnect them.
 
