@@ -1,8 +1,7 @@
 /*
   HC-05 reliable control sender for Arduino UNO.
 
-  Sends the current A/B/C/D/E/F/K button state as a framed packet:
-    0xAA 0x55 sequence buttons crc8
+  Sends the current A/B/C/D/E/F/K button state plus stick X/Y as a framed packet.
 
   Button wiring from README:
   - A: D2, pressed LOW
@@ -37,7 +36,7 @@ void loop() {
 
   if (now - lastSendTime >= SEND_INTERVAL_MS) {
     lastSendTime = now;
-    writeControlPacket(Serial, sequenceNumber, readButtons());
+    writeControlPacket(Serial, sequenceNumber, readButtons(), readStickAxis(STICK_X_PIN), readStickAxis(STICK_Y_PIN));
     sequenceNumber++;
   }
 }
@@ -74,4 +73,9 @@ byte readButtons() {
   }
 
   return buttons;
+}
+
+uint16_t readStickAxis(byte pin) {
+  const int value = analogRead(pin);
+  return constrain(value, STICK_MIN_VALUE, STICK_MAX_VALUE);
 }

@@ -9,6 +9,7 @@
   - B decreases the pitch servo angle.
   - C increases the picker servo angle.
   - D decreases the picker servo angle.
+  - X/Y stick controls the TB6612FNG drive motors.
   - K moves the stricker servo from neutral to its strike angle while pressed.
   - E moves the gate servo to one fixed angle.
   - F moves the gate servo to another fixed angle.
@@ -34,11 +35,14 @@ byte lastSequenceNumber = 0;
 bool hasReceivedPacket = false;
 byte latestButtons = 0;
 byte previousButtons = 0;
+uint16_t latestStickX = STICK_CENTER_VALUE;
+uint16_t latestStickY = STICK_CENTER_VALUE;
 unsigned long lastValidPacketTime = 0;
 
 void setup() {
   setupHc05NanoPins();
   Serial.begin(SERIAL_BAUD_RATE);
+  setupMotorDriver();
 
   pickerServo.begin(PICKER_SERVO_PIN, PICKER_MIN_ANGLE, PICKER_MAX_ANGLE, PICKER_START_ANGLE);
   strickerServo.begin(STRICKER_SERVO_PIN, 0, 180, STRICKER_START_ANGLE);
@@ -69,6 +73,8 @@ void handleControlPacket(const ControlPacket &packet) {
   lastSequenceNumber = packet.sequence;
   hasReceivedPacket = true;
   latestButtons = packet.buttons;
+  latestStickX = constrain(packet.stickX, STICK_MIN_VALUE, STICK_MAX_VALUE);
+  latestStickY = constrain(packet.stickY, STICK_MIN_VALUE, STICK_MAX_VALUE);
   lastValidPacketTime = millis();
 }
 
@@ -77,7 +83,11 @@ void applyServoControl() {
 
   if (!isControlLinkAllowed() || !hasReceivedPacket || now - lastValidPacketTime > FAILSAFE_TIMEOUT_MS) {
     latestButtons = 0;
+    latestStickX = STICK_CENTER_VALUE;
+    latestStickY = STICK_CENTER_VALUE;
   }
+
+  applyMotorControl(latestStickX, latestStickY);
 
   const bool aPressed = latestButtons & BUTTON_A_MASK;
   const bool bPressed = latestButtons & BUTTON_B_MASK;
@@ -136,4 +146,63 @@ void applyServoControl() {
   }
 
   previousButtons = latestButtons;
+}
+
+void setupMotorDriver() {
+  pinMode(MOTOR_LEFT_PWM_PIN, OUTPUT);
+  pinMode(MOTOR_LEFT_IN2_PIN, OUTPUT);
+  pinMode(MOTOR_LEFT_IN1_PIN, OUTPUT);
+  pinMode(MOTOR_STBY_PIN, OUTPUT);
+  pinMode(MOTOR_RIGHT_IN1_PIN, OUTPUT);
+  pinMode(MOTOR_RIGHT_IN2_PIN, OUTPUT);
+  pinMode(MOTOR_RIGHT_PWM_PIN, OUTPUT);
+
+  digitalWrite(MOTOR_STBY_PIN, HIGH);
+  stopMotors();
+}
+
+void applyMotorControl(uint16_t stickX, uint16_t stickY) {
+  const int turn = axisToSignedCommand(stickX);
+  const int throttle = axisToSignedCommand(stickY);
+  const int leftCommand = constrain(throttle + turn, -MOTOR_COMMAND_MAX, MOTOR_COMMAND_MAX);
+  const int rightCommand = constrain(throttle - turn, -MOTOR_COMMAND_MAX, MOTOR_COMMAND_MAX);
+
+  driveMotor(MOTOR_LEFT_PWM_PIN, MOTOR_LEFT_IN1_PIN, MOTOR_LEFT_IN2_PIN, leftCommand);
+  driveMotor(MOTOR_RIGHT_PWM_PIN, MOTOR_RIGHT_IN1_PIN, MOTOR_RIGHT_IN2_PIN, rightCommand);
+}
+
+int axisToSignedCommand(uint16_t rawValue) {
+  const int centered = int(rawValue) - STICK_CENTER_VALUE;
+
+  if (abs(centered) <= STICK_DEADBAND) {
+    return 0;
+  }
+
+  if (centered > 0) {
+    return map(centered, STICK_DEADBAND, STICK_MAX_VALUE - STICK_CENTER_VALUE, 0, MOTOR_COMMAND_MAX);
+  }
+
+  return map(centered, -STICK_CENTER_VALUE, -STICK_DEADBAND, -MOTOR_COMMAND_MAX, 0);
+}
+
+void driveMotor(byte pwmPin, byte in1Pin, byte in2Pin, int command) {
+  const int speed = constrain(abs(command), 0, MOTOR_COMMAND_MAX);
+
+  if (command > 0) {
+    digitalWrite(in1Pin, HIGH);
+    digitalWrite(in2Pin, LOW);
+  } else if (command < 0) {
+    digitalWrite(in1Pin, LOW);
+    digitalWrite(in2Pin, HIGH);
+  } else {
+    digitalWrite(in1Pin, LOW);
+    digitalWrite(in2Pin, LOW);
+  }
+
+  analogWrite(pwmPin, speed);
+}
+
+void stopMotors() {
+  driveMotor(MOTOR_LEFT_PWM_PIN, MOTOR_LEFT_IN1_PIN, MOTOR_LEFT_IN2_PIN, 0);
+  driveMotor(MOTOR_RIGHT_PWM_PIN, MOTOR_RIGHT_IN1_PIN, MOTOR_RIGHT_IN2_PIN, 0);
 }

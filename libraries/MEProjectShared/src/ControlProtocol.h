@@ -6,11 +6,13 @@
 
 const byte PACKET_START_1 = 0xAA;
 const byte PACKET_START_2 = 0x55;
-const byte PACKET_LENGTH = 5;
+const byte PACKET_LENGTH = 9;
 
 struct ControlPacket {
   byte sequence;
   byte buttons;
+  uint16_t stickX;
+  uint16_t stickY;
 };
 
 inline byte crc8(const byte *data, byte length) {
@@ -31,12 +33,16 @@ inline byte crc8(const byte *data, byte length) {
   return crc;
 }
 
-inline void writeControlPacket(Stream &serial, byte sequence, byte buttons) {
+inline void writeControlPacket(Stream &serial, byte sequence, byte buttons, uint16_t stickX, uint16_t stickY) {
   const byte packet[] = {
     PACKET_START_1,
     PACKET_START_2,
     sequence,
-    byte(buttons & CONTROL_BUTTON_MASK)
+    byte(buttons & CONTROL_BUTTON_MASK),
+    byte(stickX & 0xFF),
+    byte((stickX >> 8) & 0xFF),
+    byte(stickY & 0xFF),
+    byte((stickY >> 8) & 0xFF)
   };
   const byte crc = crc8(packet, sizeof(packet));
 
@@ -80,6 +86,8 @@ public:
 
     packet.sequence = packetBuffer[2];
     packet.buttons = packetBuffer[3] & CONTROL_BUTTON_MASK;
+    packet.stickX = uint16_t(packetBuffer[4]) | (uint16_t(packetBuffer[5]) << 8);
+    packet.stickY = uint16_t(packetBuffer[6]) | (uint16_t(packetBuffer[7]) << 8);
     return true;
   }
 

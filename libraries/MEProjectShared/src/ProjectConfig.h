@@ -24,6 +24,8 @@ const byte BUTTON_D_PIN = 5;
 const byte BUTTON_E_PIN = 6;
 const byte BUTTON_F_PIN = 7;
 const byte BUTTON_K_PIN = 8;
+const byte STICK_X_PIN = A0;
+const byte STICK_Y_PIN = A1;
 
 const byte BUTTON_A_MASK = 0x01;
 const byte BUTTON_B_MASK = 0x02;
@@ -37,6 +39,13 @@ const byte CONTROL_BUTTON_MASK = BUTTON_A_MASK | BUTTON_B_MASK | BUTTON_C_MASK |
 const byte PICKER_SERVO_PIN = 2;
 const byte STRICKER_SERVO_PIN = 3;
 const byte PITCH_SERVO_PIN = 4;
+const byte MOTOR_LEFT_PWM_PIN = 5;
+const byte MOTOR_LEFT_IN2_PIN = 6;
+const byte MOTOR_LEFT_IN1_PIN = 7;
+const byte MOTOR_STBY_PIN = 8;
+const byte MOTOR_RIGHT_IN1_PIN = 9;
+const byte MOTOR_RIGHT_IN2_PIN = 10;
+const byte MOTOR_RIGHT_PWM_PIN = 11;
 const byte GATE_SERVO_PIN = 12;
 
 const int PICKER_MIN_ANGLE = 10;
@@ -57,5 +66,11 @@ const int GATE_START_ANGLE = GATE_E_ANGLE;
 const int STRICKER_NEUTRAL_ANGLE = 90;
 const int STRICKER_ACTIVE_ANGLE = 40;
 const int STRICKER_START_ANGLE = STRICKER_NEUTRAL_ANGLE;
+
+const int STICK_MIN_VALUE = 0;
+const int STICK_MAX_VALUE = 1023;
+const int STICK_CENTER_VALUE = 512;
+const int STICK_DEADBAND = 40;
+const int MOTOR_COMMAND_MAX = 130;
 
 #endif
