@@ -21,6 +21,10 @@ const unsigned long FAILSAFE_TIMEOUT_MS = 300;
 const unsigned long HOLD_REPEAT_DELAY_MS = 400;
 const unsigned long HOLD_REPEAT_INTERVAL_MS = 150;
 
+const byte HC05_STATE_PIN = 13;
+const byte HC05_ENABLE_PIN = A0;
+const byte HC05_ENABLE_NORMAL_LEVEL = LOW;
+
 const byte PICKER_SERVO_PIN = 2;
 const byte PITCH_SERVO_PIN = 4;
 const byte GATE_SERVO_PIN = 12;
@@ -76,6 +80,7 @@ unsigned long lastCRepeatTime = 0;
 unsigned long lastDRepeatTime = 0;
 
 void setup() {
+  setupBluetoothPins();
   Serial.begin(SERIAL_BAUD_RATE);
 
   pickerServo.attach(PICKER_SERVO_PIN);
@@ -89,6 +94,12 @@ void setup() {
   gateServo.attach(GATE_SERVO_PIN);
   gateAngle = constrain(GATE_START_ANGLE, 0, 180);
   gateServo.write(gateAngle);
+}
+
+void setupBluetoothPins() {
+  pinMode(HC05_STATE_PIN, INPUT);
+  pinMode(HC05_ENABLE_PIN, OUTPUT);
+  digitalWrite(HC05_ENABLE_PIN, HC05_ENABLE_NORMAL_LEVEL);
 }
 
 void loop() {
@@ -153,7 +164,7 @@ void handleCandidatePacket() {
 void applyServoControl() {
   const unsigned long now = millis();
 
-  if (!hasReceivedPacket || now - lastValidPacketTime > FAILSAFE_TIMEOUT_MS) {
+  if (!isBluetoothConnected() || !hasReceivedPacket || now - lastValidPacketTime > FAILSAFE_TIMEOUT_MS) {
     latestButtons = 0;
   }
 
@@ -204,6 +215,10 @@ void applyServoControl() {
   }
 
   previousButtons = latestButtons;
+}
+
+bool isBluetoothConnected() {
+  return digitalRead(HC05_STATE_PIN) == HIGH;
 }
 
 void updateHoldTiming(

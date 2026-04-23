@@ -17,6 +17,10 @@ const unsigned long SERIAL_BAUD_RATE = 38400;
 const unsigned long RECEIVE_TIMEOUT_MS = 300;
 const unsigned long SWING_INTERVAL_MS = 20;
 
+const byte HC05_STATE_PIN = 13;
+const byte HC05_ENABLE_PIN = A0;
+const byte HC05_ENABLE_NORMAL_LEVEL = LOW;
+
 const byte PITCH_SERVO_PIN = 4;
 
 const int PITCH_MIN_ANGLE = 40;
@@ -32,11 +36,18 @@ unsigned long lastReceiveTime = 0;
 unsigned long lastSwingTime = 0;
 
 void setup() {
+  setupBluetoothPins();
   Serial.begin(SERIAL_BAUD_RATE);
 
   pitchServo.attach(PITCH_SERVO_PIN);
   pitchAngle = constrain(PITCH_START_ANGLE, PITCH_MIN_ANGLE, PITCH_MAX_ANGLE);
   pitchServo.write(pitchAngle);
+}
+
+void setupBluetoothPins() {
+  pinMode(HC05_STATE_PIN, INPUT);
+  pinMode(HC05_ENABLE_PIN, OUTPUT);
+  digitalWrite(HC05_ENABLE_PIN, HC05_ENABLE_NORMAL_LEVEL);
 }
 
 void loop() {
