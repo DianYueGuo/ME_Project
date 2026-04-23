@@ -9,6 +9,8 @@
   - B decreases the pitch servo angle.
   - C increases the picker servo angle.
   - D decreases the picker servo angle.
+  - E moves the gate servo to one fixed angle.
+  - F moves the gate servo to another fixed angle.
   - Servo angles are clamped by hard code limits.
 */
 
@@ -21,6 +23,7 @@ const unsigned long HOLD_REPEAT_INTERVAL_MS = 150;
 
 const byte PICKER_SERVO_PIN = 2;
 const byte PITCH_SERVO_PIN = 4;
+const byte GATE_SERVO_PIN = 12;
 
 const int PICKER_MIN_ANGLE = 10;
 const int PICKER_MAX_ANGLE = 180;
@@ -32,6 +35,10 @@ const int PITCH_MAX_ANGLE = 133;
 const int PITCH_START_ANGLE = 90;
 const int PITCH_STEP_ANGLE = 5;
 
+const int GATE_E_ANGLE = 0;
+const int GATE_F_ANGLE = 90;
+const int GATE_START_ANGLE = GATE_E_ANGLE;
+
 const byte PACKET_START_1 = 0xAA;
 const byte PACKET_START_2 = 0x55;
 const byte PACKET_LENGTH = 5;
@@ -39,10 +46,13 @@ const byte BUTTON_A_MASK = 0x01;
 const byte BUTTON_B_MASK = 0x02;
 const byte BUTTON_C_MASK = 0x04;
 const byte BUTTON_D_MASK = 0x08;
-const byte CONTROL_BUTTON_MASK = BUTTON_A_MASK | BUTTON_B_MASK | BUTTON_C_MASK | BUTTON_D_MASK;
+const byte BUTTON_E_MASK = 0x10;
+const byte BUTTON_F_MASK = 0x20;
+const byte CONTROL_BUTTON_MASK = BUTTON_A_MASK | BUTTON_B_MASK | BUTTON_C_MASK | BUTTON_D_MASK | BUTTON_E_MASK | BUTTON_F_MASK;
 
 Servo pickerServo;
 Servo pitchServo;
+Servo gateServo;
 
 byte packetBuffer[PACKET_LENGTH];
 byte packetIndex = 0;
@@ -53,6 +63,7 @@ byte latestButtons = 0;
 byte previousButtons = 0;
 int pickerAngle = PICKER_START_ANGLE;
 int pitchAngle = PITCH_START_ANGLE;
+int gateAngle = GATE_START_ANGLE;
 
 unsigned long lastValidPacketTime = 0;
 unsigned long aHoldStartTime = 0;
@@ -74,6 +85,10 @@ void setup() {
   pitchServo.attach(PITCH_SERVO_PIN);
   pitchAngle = constrain(PITCH_START_ANGLE, PITCH_MIN_ANGLE, PITCH_MAX_ANGLE);
   pitchServo.write(pitchAngle);
+
+  gateServo.attach(GATE_SERVO_PIN);
+  gateAngle = constrain(GATE_START_ANGLE, 0, 180);
+  gateServo.write(gateAngle);
 }
 
 void loop() {
@@ -146,10 +161,14 @@ void applyServoControl() {
   const bool bPressed = latestButtons & BUTTON_B_MASK;
   const bool cPressed = latestButtons & BUTTON_C_MASK;
   const bool dPressed = latestButtons & BUTTON_D_MASK;
+  const bool ePressed = latestButtons & BUTTON_E_MASK;
+  const bool fPressed = latestButtons & BUTTON_F_MASK;
   const bool aWasPressed = previousButtons & BUTTON_A_MASK;
   const bool bWasPressed = previousButtons & BUTTON_B_MASK;
   const bool cWasPressed = previousButtons & BUTTON_C_MASK;
   const bool dWasPressed = previousButtons & BUTTON_D_MASK;
+  const bool eWasPressed = previousButtons & BUTTON_E_MASK;
+  const bool fWasPressed = previousButtons & BUTTON_F_MASK;
 
   updateHoldTiming(aPressed, aWasPressed, aHoldStartTime, lastARepeatTime, now);
   updateHoldTiming(bPressed, bWasPressed, bHoldStartTime, lastBRepeatTime, now);
@@ -174,6 +193,14 @@ void applyServoControl() {
   if (dPressed && !cPressed && shouldStep(dPressed, dWasPressed, dHoldStartTime, lastDRepeatTime, now)) {
     changePickerAngle(-PICKER_STEP_ANGLE);
     lastDRepeatTime = now;
+  }
+
+  if (ePressed && !fPressed && !eWasPressed) {
+    setGateAngle(GATE_E_ANGLE);
+  }
+
+  if (fPressed && !ePressed && !fWasPressed) {
+    setGateAngle(GATE_F_ANGLE);
   }
 
   previousButtons = latestButtons;
@@ -242,6 +269,15 @@ void changePitchAngle(int delta) {
   if (nextAngle != pitchAngle) {
     pitchAngle = nextAngle;
     pitchServo.write(pitchAngle);
+  }
+}
+
+void setGateAngle(int angle) {
+  const int nextAngle = constrain(angle, 0, 180);
+
+  if (nextAngle != gateAngle) {
+    gateAngle = nextAngle;
+    gateServo.write(gateAngle);
   }
 }
 
