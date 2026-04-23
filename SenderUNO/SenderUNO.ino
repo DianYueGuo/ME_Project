@@ -1,7 +1,7 @@
 /*
   HC-05 reliable control sender for Arduino UNO.
 
-  Sends the current A/B/C/D/E/F button state as a framed packet:
+  Sends the current A/B/C/D/E/F/K button state as a framed packet:
     0xAA 0x55 sequence buttons crc8
 
   Button wiring from README:
@@ -11,6 +11,7 @@
   - D: D5, pressed LOW
   - E: D6, pressed LOW
   - F: D7, pressed LOW
+  - K: D8, pressed LOW
 */
 
 #include <ProjectConfig.h>
@@ -26,6 +27,7 @@ void setup() {
   pinMode(BUTTON_D_PIN, INPUT_PULLUP);
   pinMode(BUTTON_E_PIN, INPUT_PULLUP);
   pinMode(BUTTON_F_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_K_PIN, INPUT_PULLUP);
 
   Serial.begin(SERIAL_BAUD_RATE);
 }
@@ -65,6 +67,10 @@ byte readButtons() {
 
   if (digitalRead(BUTTON_F_PIN) == LOW) {
     buttons |= BUTTON_F_MASK;
+  }
+
+  if (digitalRead(BUTTON_K_PIN) == LOW) {
+    buttons |= BUTTON_K_MASK;
   }
 
   return buttons;

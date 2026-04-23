@@ -23,6 +23,7 @@ const byte BUTTON_C_PIN = 4;
 const byte BUTTON_D_PIN = 5;
 const byte BUTTON_E_PIN = 6;
 const byte BUTTON_F_PIN = 7;
+const byte BUTTON_K_PIN = 8;
 
 const byte BUTTON_A_MASK = 0x01;
 const byte BUTTON_B_MASK = 0x02;
@@ -30,9 +31,11 @@ const byte BUTTON_C_MASK = 0x04;
 const byte BUTTON_D_MASK = 0x08;
 const byte BUTTON_E_MASK = 0x10;
 const byte BUTTON_F_MASK = 0x20;
-const byte CONTROL_BUTTON_MASK = BUTTON_A_MASK | BUTTON_B_MASK | BUTTON_C_MASK | BUTTON_D_MASK | BUTTON_E_MASK | BUTTON_F_MASK;
+const byte BUTTON_K_MASK = 0x40;
+const byte CONTROL_BUTTON_MASK = BUTTON_A_MASK | BUTTON_B_MASK | BUTTON_C_MASK | BUTTON_D_MASK | BUTTON_E_MASK | BUTTON_F_MASK | BUTTON_K_MASK;
 
 const byte PICKER_SERVO_PIN = 2;
+const byte STRICKER_SERVO_PIN = 3;
 const byte PITCH_SERVO_PIN = 4;
 const byte GATE_SERVO_PIN = 12;
 
@@ -50,5 +53,9 @@ const int PITCH_SWING_STEP_ANGLE = 1;
 const int GATE_E_ANGLE = 80;
 const int GATE_F_ANGLE = 45;
 const int GATE_START_ANGLE = GATE_E_ANGLE;
+
+const int STRICKER_NEUTRAL_ANGLE = 90;
+const int STRICKER_ACTIVE_ANGLE = 40;
+const int STRICKER_START_ANGLE = STRICKER_NEUTRAL_ANGLE;
 
 #endif
