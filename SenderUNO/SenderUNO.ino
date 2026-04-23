@@ -13,7 +13,7 @@
   - F: D7, pressed LOW
 */
 
-const unsigned long SERIAL_BAUD_RATE = 9600;
+const unsigned long SERIAL_BAUD_RATE = 38400;
 const unsigned long SEND_INTERVAL_MS = 25;
 
 const byte BUTTON_A_PIN = 2;

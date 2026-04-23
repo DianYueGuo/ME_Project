@@ -16,7 +16,7 @@
 
 #include <Servo.h>
 
-const unsigned long SERIAL_BAUD_RATE = 9600;
+const unsigned long SERIAL_BAUD_RATE = 38400;
 const unsigned long FAILSAFE_TIMEOUT_MS = 300;
 const unsigned long HOLD_REPEAT_DELAY_MS = 400;
 const unsigned long HOLD_REPEAT_INTERVAL_MS = 150;

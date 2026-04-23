@@ -13,7 +13,7 @@
 
 #include <Servo.h>
 
-const unsigned long SERIAL_BAUD_RATE = 9600;
+const unsigned long SERIAL_BAUD_RATE = 38400;
 const unsigned long RECEIVE_TIMEOUT_MS = 300;
 const unsigned long SWING_INTERVAL_MS = 20;
 
