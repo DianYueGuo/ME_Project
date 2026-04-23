@@ -47,8 +47,8 @@ const int PITCH_START_ANGLE = 90;
 const int PITCH_STEP_ANGLE = 5;
 const int PITCH_SWING_STEP_ANGLE = 1;
 
-const int GATE_E_ANGLE = 0;
-const int GATE_F_ANGLE = 90;
+const int GATE_E_ANGLE = 85;
+const int GATE_F_ANGLE = 30;
 const int GATE_START_ANGLE = GATE_E_ANGLE;
 
 #endif
