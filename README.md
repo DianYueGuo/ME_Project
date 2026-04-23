@@ -1,6 +1,6 @@
 # ME_Project
 
-## Remote Controller Details
+## Remote Controller Details (Sender)
 
 Button A: pressed D2=0, released D2=1
 Button B: pressed D3=0, released D3=1
@@ -13,7 +13,7 @@ Button K: pressed D8=0, released D8=1
 Stick X: Full left A0=0, Neutral A0=507-508, Full right A0=1023
 Stick Y: Full down A1=0, Neutral A1=513, Full up A1=1023
 
-## RC Car Controller Arduino Nano Pin Connections
+## RC Car Controller Arduino Nano Pin Connections (Receiver)
 
 ### Power
 - **VIN** → None
