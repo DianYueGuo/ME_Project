@@ -98,5 +98,5 @@ Stick Y: Full down A1=0, Neutral A1=513, Full up A1=1023
 
 ### HC-05 Control Pins
 - Receiver Bluetooth sketches configure **D13** as `INPUT` for HC-05 `STATE`.
-- Receiver Bluetooth sketches configure **A0** as `OUTPUT` and drive it `LOW` to keep common HC-05 `KEY/EN` pins in normal Bluetooth data mode instead of AT mode.
-- If your HC-05 breakout uses `EN` as an active-high power enable instead of a `KEY/AT mode` input, change `HC05_ENABLE_NORMAL_LEVEL` from `LOW` to `HIGH` in the Nano sketch.
+- Receiver Bluetooth sketches leave **A0** as `INPUT` by default so the code does not accidentally disable the HC-05 or force AT mode.
+- If you want the Nano to drive HC-05 `ENABLE/KEY`, set `HC05_DRIVE_ENABLE_PIN` to `true` in `libraries/MEProjectShared/src/ProjectConfig.h`, then set `HC05_ENABLE_NORMAL_LEVEL` for your breakout.

@@ -6,8 +6,13 @@
 
 inline void setupHc05NanoPins() {
   pinMode(HC05_STATE_PIN, INPUT);
-  pinMode(HC05_ENABLE_PIN, OUTPUT);
-  digitalWrite(HC05_ENABLE_PIN, HC05_ENABLE_NORMAL_LEVEL);
+
+  if (HC05_DRIVE_ENABLE_PIN) {
+    pinMode(HC05_ENABLE_PIN, OUTPUT);
+    digitalWrite(HC05_ENABLE_PIN, HC05_ENABLE_NORMAL_LEVEL);
+  } else {
+    pinMode(HC05_ENABLE_PIN, INPUT);
+  }
 }
 
 inline bool isHc05Connected() {

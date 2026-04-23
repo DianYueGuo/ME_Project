@@ -13,6 +13,7 @@ const unsigned long SWING_INTERVAL_MS = 20;
 
 const byte HC05_STATE_PIN = 13;
 const byte HC05_ENABLE_PIN = A0;
+const bool HC05_DRIVE_ENABLE_PIN = false;
 const byte HC05_ENABLE_NORMAL_LEVEL = LOW;
 
 const byte BUTTON_A_PIN = 2;
