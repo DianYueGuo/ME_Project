@@ -98,5 +98,6 @@ Stick Y: Full down A1=0, Neutral A1=513, Full up A1=1023
 
 ### HC-05 Control Pins
 - Receiver Bluetooth sketches configure **D13** as `INPUT` for HC-05 `STATE`.
+- `REQUIRE_HC05_STATE_CONNECTED` is `false` by default so direct UNO TX → Nano RX testing works without an HC-05 `STATE` signal. Set it to `true` in `libraries/MEProjectShared/src/ProjectConfig.h` if the real receiver should ignore packets unless HC-05 `STATE` is high.
 - Receiver Bluetooth sketches leave **A0** as `INPUT` by default so the code does not accidentally disable the HC-05 or force AT mode.
 - If you want the Nano to drive HC-05 `ENABLE/KEY`, set `HC05_DRIVE_ENABLE_PIN` to `true` in `libraries/MEProjectShared/src/ProjectConfig.h`, then set `HC05_ENABLE_NORMAL_LEVEL` for your breakout.

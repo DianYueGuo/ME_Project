@@ -72,7 +72,7 @@ void handleControlPacket(const ControlPacket &packet) {
 void applyServoControl() {
   const unsigned long now = millis();
 
-  if (!isHc05Connected() || !hasReceivedPacket || now - lastValidPacketTime > FAILSAFE_TIMEOUT_MS) {
+  if (!isControlLinkAllowed() || !hasReceivedPacket || now - lastValidPacketTime > FAILSAFE_TIMEOUT_MS) {
     latestButtons = 0;
   }
 

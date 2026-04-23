@@ -19,4 +19,8 @@ inline bool isHc05Connected() {
   return digitalRead(HC05_STATE_PIN) == HIGH;
 }
 
+inline bool isControlLinkAllowed() {
+  return !REQUIRE_HC05_STATE_CONNECTED || isHc05Connected();
+}
+
 #endif
