@@ -1,10 +1,12 @@
 /*
   HC-05 reliable control sender for Arduino UNO.
 
-  Sends the current C/D button state as a framed packet:
+  Sends the current A/B/C/D button state as a framed packet:
     0xAA 0x55 sequence buttons crc8
 
   Button wiring from README:
+  - A: D2, pressed LOW
+  - B: D3, pressed LOW
   - C: D4, pressed LOW
   - D: D5, pressed LOW
 */
@@ -12,18 +14,24 @@
 const unsigned long SERIAL_BAUD_RATE = 9600;
 const unsigned long SEND_INTERVAL_MS = 25;
 
+const byte BUTTON_A_PIN = 2;
+const byte BUTTON_B_PIN = 3;
 const byte BUTTON_C_PIN = 4;
 const byte BUTTON_D_PIN = 5;
 
 const byte PACKET_START_1 = 0xAA;
 const byte PACKET_START_2 = 0x55;
-const byte BUTTON_C_MASK = 0x01;
-const byte BUTTON_D_MASK = 0x02;
+const byte BUTTON_A_MASK = 0x01;
+const byte BUTTON_B_MASK = 0x02;
+const byte BUTTON_C_MASK = 0x04;
+const byte BUTTON_D_MASK = 0x08;
 
 byte sequenceNumber = 0;
 unsigned long lastSendTime = 0;
 
 void setup() {
+  pinMode(BUTTON_A_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_B_PIN, INPUT_PULLUP);
   pinMode(BUTTON_C_PIN, INPUT_PULLUP);
   pinMode(BUTTON_D_PIN, INPUT_PULLUP);
 
@@ -57,6 +65,14 @@ void sendControlPacket() {
 
 byte readButtons() {
   byte buttons = 0;
+
+  if (digitalRead(BUTTON_A_PIN) == LOW) {
+    buttons |= BUTTON_A_MASK;
+  }
+
+  if (digitalRead(BUTTON_B_PIN) == LOW) {
+    buttons |= BUTTON_B_MASK;
+  }
 
   if (digitalRead(BUTTON_C_PIN) == LOW) {
     buttons |= BUTTON_C_MASK;
