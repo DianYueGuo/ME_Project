@@ -71,6 +71,6 @@ const int STICK_MIN_VALUE = 0;
 const int STICK_MAX_VALUE = 1023;
 const int STICK_CENTER_VALUE = 512;
 const int STICK_DEADBAND = 40;
-const int MOTOR_COMMAND_MAX = 130;
+const int MOTOR_COMMAND_MAX = 110;
 
 #endif
